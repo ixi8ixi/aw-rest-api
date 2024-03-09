@@ -1,10 +1,8 @@
 package com.anwhiteko.vk.configuration;
 
 import com.anwhiteko.vk.processing.db.model.Permission;
-import com.anwhiteko.vk.rest.auth.jwt.configuration.JwtTokenConfig;
 import com.anwhiteko.vk.security.SecurityUserDetailsService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -19,7 +17,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableMethodSecurity
-@EnableConfigurationProperties({ JwtTokenConfig.class })
 @RequiredArgsConstructor
 public class SecurityConfiguration {
     protected final SecurityUserDetailsService securityUserDetailsService;
