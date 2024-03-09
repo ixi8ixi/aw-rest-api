@@ -29,6 +29,8 @@ dependencies {
 	annotationProcessor libs.lombok
 
 	testImplementation libs.spring.test
+	testCompileOnly libs.lombok
+	testAnnotationProcessor libs.lombok
 }
 
 tasks.named('test') {
