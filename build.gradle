@@ -21,6 +21,8 @@ dependencies {
 	implementation libs.spring.security
 	implementation libs.spring.actuator
 
+	implementation libs.spring.webflux
+
 	implementation libs.spring.jpa
 	implementation libs.postgresql.driver
 	implementation libs.liquibase

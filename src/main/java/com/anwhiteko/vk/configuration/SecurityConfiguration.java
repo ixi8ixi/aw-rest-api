@@ -1,6 +1,5 @@
 package com.anwhiteko.vk.configuration;
 
-import com.anwhiteko.vk.processing.db.model.Permission;
 import com.anwhiteko.vk.security.SecurityUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -28,13 +27,10 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(new AntPathRequestMatcher("/api"))
                             .permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/api/hidden"))
-                            .hasAuthority(Permission.EDIT_ALBUMS.name()) // todo cringe
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
 
         http.authenticationProvider(daoAuthenticationProvider());
-
         return http.build();
     }
 
