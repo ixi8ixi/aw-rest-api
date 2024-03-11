@@ -1,23 +1,19 @@
 package com.anwhiteko.vk.rest.controller;
 
-import com.anwhiteko.vk.rest.controller.dto.post.Post;
+import com.anwhiteko.vk.rest.controller.dto.Comment;
+import com.anwhiteko.vk.rest.controller.dto.Post;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class RestProxyController {
-    private final WebClient webClient;
+    private final CachedApiClient cachedApiClient;
 
     @GetMapping
     public String home() {
@@ -26,14 +22,43 @@ public class RestProxyController {
 
     @GetMapping("/posts")
     @PreAuthorize("hasAuthority('VIEW_POSTS')")
-    public List<Post> viewPosts() {
-        return webClient
-                .get()
-                .uri("/posts")
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<Post>>() {})
-                .block();
+    public Mono<List<Post>> viewPosts() {
+        return cachedApiClient.viewPosts();
     }
 
+    @GetMapping("/posts/{id}")
+    @PreAuthorize("hasAuthority('VIEW_POSTS')")
+    public Mono<Post> viewSinglePost(@PathVariable int id) {
+        return cachedApiClient.viewSinglePost(id);
+    }
 
+    @PostMapping("/posts")
+    @PreAuthorize("hasAuthority('EDIT_POSTS')")
+    public Mono<Post> addPost(@RequestBody Post post) {
+        return cachedApiClient.addPost(post);
+    }
+
+    @PutMapping("/posts/{id}")
+    @PreAuthorize(("hasAuthority('EDIT_POSTS')"))
+    public Mono<Post> updatePost(@PathVariable int id, @RequestBody Post post) {
+        return cachedApiClient.updatePost(id, post);
+    }
+
+    @DeleteMapping("/posts/{id}")
+    @PreAuthorize("hasAuthority('EDIT_POSTS')")
+    public void deletePost(@PathVariable long id) {
+        cachedApiClient.deletePost(id);
+    }
+
+    @GetMapping("posts/{id}/comments")
+    @PreAuthorize("hasAuthority('VIEW_POSTS')")
+    public Mono<List<Comment>> viewComments(@PathVariable int id) {
+        return cachedApiClient.viewComments(id);
+    }
+
+    @PostMapping("posts/{id}/comments")
+    @PreAuthorize("hasAuthority('EDIT_POSTS')")
+    public Mono<Comment> addComment(@PathVariable int id, @RequestBody Comment comment) {
+        return cachedApiClient.addComment(id, comment);
+    }
 }
