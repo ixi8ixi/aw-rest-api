@@ -1,6 +1,7 @@
 package com.anwhiteko.vk.rest.controller;
 
 import com.anwhiteko.vk.rest.controller.dto.album.Album;
+import com.anwhiteko.vk.rest.controller.dto.album.Photo;
 import com.anwhiteko.vk.rest.controller.dto.post.Comment;
 import com.anwhiteko.vk.rest.controller.dto.post.Post;
 import com.anwhiteko.vk.rest.controller.dto.user.ToDo;
@@ -78,6 +79,34 @@ public class CachedApiClient {
 
     public Flux<Album> viewUsersAlbums(long id) {
         return getFlux("/users/%s/albums".formatted(id), Album.class);
+    }
+
+    public Flux<Album> viewAlbums() {
+        return getFlux("/albums", Album.class);
+    }
+
+    public Mono<Album> viewAlbum(long id) {
+        return get("/alnums/%s".formatted(id), Album.class);
+    }
+
+    public Mono<Album> addAlbum(Album album) {
+        return post("/albums", Album.class, album);
+    }
+
+    public Mono<Album> updateAlbum(long id, Album album) {
+        return put("/albums/%s".formatted(id), Album.class, album);
+    }
+
+    public void deleteAlbum(long id) {
+        delete("/albums/%s".formatted(id));
+    }
+
+    public Flux<Photo> viewAlbumPhotos(long id) {
+        return getFlux("/albums/%s/photos".formatted(id), Photo.class);
+    }
+
+    public Mono<Photo> addPhoto(long id, Photo photo) {
+        return post("/albums/%s/photos".formatted(id), Photo.class, photo);
     }
 
     private <T> Mono<T> get(String uri, Class<T> clazz) {

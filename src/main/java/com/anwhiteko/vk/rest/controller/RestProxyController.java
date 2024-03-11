@@ -1,6 +1,7 @@
 package com.anwhiteko.vk.rest.controller;
 
 import com.anwhiteko.vk.rest.controller.dto.album.Album;
+import com.anwhiteko.vk.rest.controller.dto.album.Photo;
 import com.anwhiteko.vk.rest.controller.dto.post.Comment;
 import com.anwhiteko.vk.rest.controller.dto.post.Post;
 import com.anwhiteko.vk.rest.controller.dto.user.ToDo;
@@ -116,5 +117,47 @@ public class RestProxyController {
     @PreAuthorize("hasAuthority('VIEW_USERS') and hasAuthority('VIEW_ALBUMS')")
     public Flux<Album> viewUsersAlbums(@PathVariable long id) {
         return cachedApiClient.viewUsersAlbums(id);
+    }
+
+    @GetMapping("/albums")
+    @PreAuthorize("hasAuthority('VIEW_ALBUMS')")
+    public Flux<Album> viewAlbums() {
+        return cachedApiClient.viewAlbums();
+    }
+
+    @GetMapping("/albums/{id}")
+    @PreAuthorize("hasAuthority('VIEW_ALBUMS')")
+    public Mono<Album> viewAlbum(@PathVariable long id) {
+        return cachedApiClient.viewAlbum(id);
+    }
+
+    @PostMapping("/albums")
+    @PreAuthorize("hasAuthority('EDIT_ALBUMS')")
+    public Mono<Album> addAlbum(@RequestBody Album album) {
+        return cachedApiClient.addAlbum(album);
+    }
+
+    @PutMapping("/albums/{id}")
+    @PreAuthorize("hasAuthority('EDIT_ALBUMS')")
+    public Mono<Album> updateAlbum(@PathVariable long id, @RequestBody Album album) {
+        return cachedApiClient.updateAlbum(id, album);
+    }
+
+    @DeleteMapping("/albums/{id}")
+    @PreAuthorize("hasAuthority('EDIT_ALBUMS')")
+    public void deleteAlbum(@PathVariable long id) {
+        cachedApiClient.deleteAlbum(id);
+    }
+
+    @GetMapping("/albums/{id}/photos")
+    @PreAuthorize("hasAuthority('VIEW_ALBUMS')")
+    public Flux<Photo> viewAlbumPhotos(@PathVariable long id) {
+        return cachedApiClient.viewAlbumPhotos(id);
+    }
+
+    @PostMapping("/albums/{id}/photos")
+    @PreAuthorize("hasAuthority('EDIT_ALBUMS')")
+    public Mono<Photo> addPhoto(@PathVariable long id, @RequestBody Photo photo) {
+        return cachedApiClient.addPhoto(id, photo);
     }
 }
