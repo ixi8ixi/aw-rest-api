@@ -7,7 +7,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-public enum Role {
+public enum Role { // todo прочитать как маппятся enumы
     ROLE_ADMIN(EnumSet.allOf(Permission.class)),
     ROLE_POSTS(EnumSet.of(Permission.EDIT_POSTS, Permission.VIEW_POSTS)),
     ROLE_USERS(EnumSet.of(Permission.EDIT_USERS, Permission.VIEW_USERS)),
