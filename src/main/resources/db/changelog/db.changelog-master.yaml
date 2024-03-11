@@ -5,3 +5,5 @@ databaseChangeLog:
       file: classpath:/db/changelog/changes/002-add-admin.sql
   - include:
       file: classpath:/db/changelog/changes/003-add-role-examples.sql
+  - include:
+      file: classpath:/db/changelog/changes/004-add-event-table.sql
