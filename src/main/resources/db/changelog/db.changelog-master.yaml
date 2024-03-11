@@ -7,3 +7,5 @@ databaseChangeLog:
       file: classpath:/db/changelog/changes/003-add-role-examples.sql
   - include:
       file: classpath:/db/changelog/changes/004-add-event-table.sql
+  - include:
+      file: classpath:/db/changelog/changes/005-create-seq-for-auto-generated-idx.sql
