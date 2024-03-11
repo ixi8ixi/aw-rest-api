@@ -1,6 +1,7 @@
 package com.anwhiteko.vk.configuration;
 
 import com.anwhiteko.vk.security.SecurityUserDetailsService;
+import com.anwhiteko.vk.security.event.log.LoggerFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -19,6 +21,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
     protected final SecurityUserDetailsService securityUserDetailsService;
+    protected final LoggerFilter loggerFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -31,6 +34,7 @@ public class SecurityConfiguration {
                 .httpBasic(Customizer.withDefaults());
 
         http.authenticationProvider(daoAuthenticationProvider());
+        http.addFilterAfter(loggerFilter, BasicAuthenticationFilter.class);
         return http.build();
     }
 

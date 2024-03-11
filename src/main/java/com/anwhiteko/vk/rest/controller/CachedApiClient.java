@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 public class CachedApiClient {
     private final WebClient webClient;
 
+
     public Flux<Post> viewPosts() {
         return getFlux("/posts", Post.class);
     }

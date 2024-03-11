@@ -6,8 +6,11 @@ import com.anwhiteko.vk.rest.controller.dto.post.Comment;
 import com.anwhiteko.vk.rest.controller.dto.post.Post;
 import com.anwhiteko.vk.rest.controller.dto.user.ToDo;
 import com.anwhiteko.vk.rest.controller.dto.user.User;
+import com.anwhiteko.vk.security.SecurityUser;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -19,8 +22,8 @@ public class RestProxyController {
     private final CachedApiClient cachedApiClient;
 
     @GetMapping
-    public String home() {
-        return "Hello, world!";
+    public String home(Authentication authentication) { // todo проверять наличие аутентификации в
+        return "Hello, World!";
     }
 
     @GetMapping("/posts")
@@ -31,7 +34,10 @@ public class RestProxyController {
 
     @GetMapping("/posts/{id}")
     @PreAuthorize("hasAuthority('VIEW_POSTS')")
-    public Mono<Post> viewSinglePost(@PathVariable long id) {
+    public Mono<Post> viewSinglePost(HttpServletRequest httpServletRequest, @PathVariable long id) {
+        System.out.println(httpServletRequest.getRequestURI());
+        SecurityUser securityUser = (SecurityUser) httpServletRequest.getUserPrincipal();
+        System.out.println(securityUser.getUsername());
         return cachedApiClient.viewSinglePost(id);
     }
 
