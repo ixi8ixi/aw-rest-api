@@ -1,13 +1,15 @@
 package com.anwhiteko.vk.rest.controller;
 
-import com.anwhiteko.vk.rest.controller.dto.Comment;
-import com.anwhiteko.vk.rest.controller.dto.Post;
+import com.anwhiteko.vk.rest.controller.dto.album.Album;
+import com.anwhiteko.vk.rest.controller.dto.post.Comment;
+import com.anwhiteko.vk.rest.controller.dto.post.Post;
+import com.anwhiteko.vk.rest.controller.dto.user.ToDo;
+import com.anwhiteko.vk.rest.controller.dto.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -22,13 +24,13 @@ public class RestProxyController {
 
     @GetMapping("/posts")
     @PreAuthorize("hasAuthority('VIEW_POSTS')")
-    public Mono<List<Post>> viewPosts() {
+    public Flux<Post> viewPosts() {
         return cachedApiClient.viewPosts();
     }
 
     @GetMapping("/posts/{id}")
     @PreAuthorize("hasAuthority('VIEW_POSTS')")
-    public Mono<Post> viewSinglePost(@PathVariable int id) {
+    public Mono<Post> viewSinglePost(@PathVariable long id) {
         return cachedApiClient.viewSinglePost(id);
     }
 
@@ -40,7 +42,7 @@ public class RestProxyController {
 
     @PutMapping("/posts/{id}")
     @PreAuthorize(("hasAuthority('EDIT_POSTS')"))
-    public Mono<Post> updatePost(@PathVariable int id, @RequestBody Post post) {
+    public Mono<Post> updatePost(@PathVariable long id, @RequestBody Post post) {
         return cachedApiClient.updatePost(id, post);
     }
 
@@ -50,15 +52,69 @@ public class RestProxyController {
         cachedApiClient.deletePost(id);
     }
 
-    @GetMapping("posts/{id}/comments")
+    @GetMapping("/posts/{id}/comments")
     @PreAuthorize("hasAuthority('VIEW_POSTS')")
-    public Mono<List<Comment>> viewComments(@PathVariable int id) {
+    public Flux<Comment> viewComments(@PathVariable long id) {
         return cachedApiClient.viewComments(id);
     }
 
-    @PostMapping("posts/{id}/comments")
+    @PostMapping("/posts/{id}/comments")
     @PreAuthorize("hasAuthority('EDIT_POSTS')")
-    public Mono<Comment> addComment(@PathVariable int id, @RequestBody Comment comment) {
+    public Mono<Comment> addComment(@PathVariable long id, @RequestBody Comment comment) {
         return cachedApiClient.addComment(id, comment);
+    }
+
+    @GetMapping("/users")
+    @PreAuthorize("hasAuthority('VIEW_USERS')")
+    public Flux<User> viewUsers() {
+        return cachedApiClient.viewUsers();
+    }
+
+    @GetMapping("/users/{id}")
+    @PreAuthorize("hasAuthority('VIEW_USERS')")
+    public Mono<User> viewUser(@PathVariable long id) {
+        return cachedApiClient.viewUser(id);
+    }
+
+    @PostMapping("/users")
+    @PreAuthorize("hasAuthority('EDIT_USERS')")
+    public Mono<User> addUser(@RequestBody User user) {
+        return cachedApiClient.addUser(user);
+    }
+
+    @PutMapping("/users/{id}")
+    @PreAuthorize("hasAuthority('EDIT_USERS')")
+    public Mono<User> updateUser(@PathVariable long id, @RequestBody User user) {
+        return cachedApiClient.updateUser(id, user);
+    }
+
+    @DeleteMapping("/users/{id}")
+    @PreAuthorize("hasAuthority('EDIT_USERS')")
+    public void deleteUser(@PathVariable long id) {
+        cachedApiClient.deleteUser(id);
+    }
+
+    @GetMapping("/users/{id}/todos")
+    @PreAuthorize("hasAuthority('VIEW_USERS')")
+    public Flux<ToDo> viewToDos(@PathVariable long id) {
+        return cachedApiClient.viewToDos(id);
+    }
+
+    @PostMapping("/users/{id}/todos")
+    @PreAuthorize("hasAuthority('EDIT_USERS')")
+    public Mono<ToDo> addToDo(@PathVariable long id, ToDo todo) {
+        return cachedApiClient.addToDo(id, todo);
+    }
+
+    @GetMapping("/users/{id}/posts")
+    @PreAuthorize("hasAuthority('VIEW_USERS') and hasAuthority('VIEW_POSTS')")
+    public Flux<Post> viewUsersPosts(@PathVariable long id) {
+        return cachedApiClient.viewUsersPosts(id);
+    }
+
+    @GetMapping("/users/{id}/albums")
+    @PreAuthorize("hasAuthority('VIEW_USERS') and hasAuthority('VIEW_ALBUMS')")
+    public Flux<Album> viewUsersAlbums(@PathVariable long id) {
+        return cachedApiClient.viewUsersAlbums(id);
     }
 }

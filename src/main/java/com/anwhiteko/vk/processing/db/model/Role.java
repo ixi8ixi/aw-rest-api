@@ -20,7 +20,7 @@ public enum Role {
     }
 
     public List<GrantedAuthority> getAuthorities() {
-        return permissions.stream()
+        return permissions.stream() // fixme Переделать permission.name()
                 .map(permission -> (GrantedAuthority) new SimpleGrantedAuthority(permission.name()))
                 .toList();
     }

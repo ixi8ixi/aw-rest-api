@@ -1,4 +1,4 @@
-package com.anwhiteko.vk.rest.controller.dto;
+package com.anwhiteko.vk.rest.controller.dto.post;
 
 public record Post(
         long id,
