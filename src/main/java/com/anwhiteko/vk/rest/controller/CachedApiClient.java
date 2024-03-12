@@ -7,153 +7,201 @@ import com.anwhiteko.vk.rest.controller.dto.post.Post;
 import com.anwhiteko.vk.rest.controller.dto.user.ToDo;
 import com.anwhiteko.vk.rest.controller.dto.user.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
+import java.util.List;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CachedApiClient {
-    private final WebClient webClient;
+    private final RestTemplate restTemplate;  // todo add http template exceptions handling
 
-
-    public Flux<Post> viewPosts() {
-        return getFlux("/posts", Post.class);
+    @Cacheable(value = "all_posts")
+    public List<Post> viewPosts() {
+        log.info("all posts");
+        return Arrays.asList(get("/posts", Post[].class));
     }
 
-    public Mono<Post> viewSinglePost(long id) {
+    @Cacheable(value = "posts", key = "#id")
+    public Post viewSinglePost(long id) {
+        log.info("Singe get");
         return get("/posts/%s".formatted(id), Post.class);
     }
 
-    public Mono<Post> addPost(Post post) {
+    @CachePut(value = "posts", key = "#result.id()")
+    @CacheEvict(value = "all_posts", allEntries = true)
+    public Post addPost(Post post) {
+        log.info("Single post");
         return post("/posts", Post.class, post);
     }
 
-    public Mono<Post> updatePost(long id, Post post) {
+    @CachePut(value = "posts", key = "#result.id()")
+    @CacheEvict(value = "all_posts", allEntries = true)
+    public Post updatePost(long id, Post post) {
+        log.info("Single put");
         return put("/posts/%s".formatted(id), Post.class, post);
     }
 
+    @Caching(evict = {
+        @CacheEvict(value = "posts", key = "#id"),
+        @CacheEvict(value = "comments", key = "#id"),
+        @CacheEvict(value = "all_posts", allEntries = true)
+    })
     public void deletePost(long id) {
+        log.info("Single delete");
         delete("/posts/%s".formatted(id));
     }
 
-    public Flux<Comment> viewComments(long id) {
-        return getFlux("/posts/%s/comments".formatted(id), Comment.class);
+    @Cacheable(value = "comments", key = "#id")
+    public List<Comment> viewComments(long id) {
+        log.info("comments");
+        return Arrays.asList(get("/posts/%s/comments".formatted(id), Comment[].class));
     }
 
-    public Mono<Comment> addComment(long id, Comment comment) {
+    @CacheEvict(value = "comments", key = "#id")
+    public Comment addComment(long id, Comment comment) {
         return post("/posts/%s/comments".formatted(id), Comment.class, comment);
     }
 
-    public Flux<User> viewUsers() {
-        return getFlux("/users", User.class);
+    @Cacheable(value = "all_users")
+    public List<User> viewUsers() {
+        return Arrays.asList(get("/users", User[].class));
     }
 
-    public Mono<User> viewUser(long id) {
+    @Cacheable(value = "users", key = "#id")
+    public User viewUser(long id) {
         return get("/users/%s".formatted(id), User.class);
     }
 
-    public Mono<User> addUser(User user) {
+    @CachePut(value = "users", key = "#result.id()")
+    @CacheEvict(value = "all_users", allEntries = true)
+    public User addUser(User user) {
         return post("/users", User.class, user);
     }
 
-    public Mono<User> updateUser(long id, User user) {
+    @CachePut(value = "users", key = "#result.id()")
+    @CacheEvict(value = "all_users", allEntries = true)
+    public User updateUser(long id, User user) {
         return put("/users/%s".formatted(id), User.class, user);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "users", key = "#id"),
+            @CacheEvict(value = "todos", key = "#id"),
+            @CacheEvict(value = "user_posts", key = "#id"),
+            @CacheEvict(value = "user_albums", key = "#id"),
+            @CacheEvict(value = "all_users", allEntries = true)
+    })
     public void deleteUser(long id) {
         delete("/users/%s".formatted(id));
     }
 
-    public Flux<ToDo> viewToDos(long id) {
-        return getFlux("/users/%s/todos".formatted(id), ToDo.class);
+    @Cacheable(value = "todos", key = "#id")
+    public List<ToDo> viewToDos(long id) {
+        return Arrays.asList(get("/users/%s/todos".formatted(id), ToDo[].class));
     }
 
-    public Mono<ToDo> addToDo(long id, ToDo todo) {
+    @CacheEvict(value = "todos", key = "#id")
+    public ToDo addToDo(long id, ToDo todo) {
         return post("/users/%s/todos".formatted(id), ToDo.class, todo);
     }
 
-    public Flux<Post> viewUsersPosts(long id) {
-        return getFlux("/users/%s/posts".formatted(id), Post.class);
+    @Cacheable(value = "user_posts", key = "#id")
+    public List<Post> viewUsersPosts(long id) {
+        return Arrays.asList(get("/users/%s/posts".formatted(id), Post[].class));
     }
 
-    public Flux<Album> viewUsersAlbums(long id) {
-        return getFlux("/users/%s/albums".formatted(id), Album.class);
+    @Cacheable(value = "user_albums", key = "#id")
+    public List<Album> viewUsersAlbums(long id) {
+        return Arrays.asList(get("/users/%s/albums".formatted(id), Album[].class));
     }
 
-    public Flux<Album> viewAlbums() {
-        return getFlux("/albums", Album.class);
+    @Cacheable(value = "all_albums")
+    public List<Album> viewAlbums() {
+        return Arrays.asList(get("/albums", Album[].class));
     }
 
-    public Mono<Album> viewAlbum(long id) {
+    @Cacheable(value = "albums", key = "#id")
+    public Album viewAlbum(long id) {
         return get("/alnums/%s".formatted(id), Album.class);
     }
 
-    public Mono<Album> addAlbum(Album album) {
+    @CachePut(value = "albums", key = "#result.id()")
+    @CacheEvict(value = "all_albums", allEntries = true)
+    public Album addAlbum(Album album) {
         return post("/albums", Album.class, album);
     }
 
-    public Mono<Album> updateAlbum(long id, Album album) {
+    @CachePut(value = "albums", key = "#result.id()")
+    @CacheEvict(value = "all_albums", allEntries = true)
+    public Album updateAlbum(long id, Album album) {
         return put("/albums/%s".formatted(id), Album.class, album);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "albums", key = "#id"),
+            @CacheEvict(value = "all_albums", allEntries = true),
+            @CacheEvict(value = "photos", key = "#id")
+    })
     public void deleteAlbum(long id) {
         delete("/albums/%s".formatted(id));
     }
 
-    public Flux<Photo> viewAlbumPhotos(long id) {
-        return getFlux("/albums/%s/photos".formatted(id), Photo.class);
+    @Cacheable(value = "photos", key = "#id")
+    public List<Photo> viewAlbumPhotos(long id) {
+        return Arrays.asList(get("/albums/%s/photos".formatted(id), Photo[].class));
     }
 
-    public Mono<Photo> addPhoto(long id, Photo photo) {
+    @CacheEvict(value = "photos", key = "#id")
+    public Photo addPhoto(long id, Photo photo) {
         return post("/albums/%s/photos".formatted(id), Photo.class, photo);
     }
 
-    private <T> Mono<T> get(String uri, Class<T> clazz) {
-        return webClient
-                .get()
-                .uri(uri)
-                .retrieve()
-                .bodyToMono(clazz)
-                .cache();
+    @Scheduled(fixedDelayString = "${caching.timeout}")
+    @Caching(evict = {
+            @CacheEvict(value = "photos", allEntries = true),
+            @CacheEvict(value = "todos", allEntries = true),
+            @CacheEvict(value = "comments", allEntries = true),
+            @CacheEvict(value = "user_posts", allEntries = true),
+            @CacheEvict(value = "user_albums", allEntries = true),
+            @CacheEvict(value = "posts", allEntries = true),
+            @CacheEvict(value = "users", allEntries = true),
+            @CacheEvict(value = "albums", allEntries = true),
+            @CacheEvict(value = "all_posts", allEntries = true),
+            @CacheEvict(value = "all_users", allEntries = true),
+            @CacheEvict(value = "all_albums", allEntries = true),
+    })
+    public void invalidateCache() {}
+
+    private <T> T get(String uri, Class<T> clazz) {
+        return restTemplate.getForEntity(uri, clazz).getBody();
     }
 
-    private <T> Flux<T> getFlux(String uri, Class<T> clazz) {
-        return webClient
-                .get()
-                .uri(uri)
-                .retrieve()
-                .bodyToFlux(clazz)
-                .cache();
-    }
-
-    private <T> Mono<T> post(String uri, Class<T> clazz, T content) {
-        return webClient
-                .post()
-                .uri(uri)
-                .body(Mono.just(content), clazz)
-                .retrieve()
-                .bodyToMono(clazz)
-                .cache();
+    private <T> T post(String uri, Class<T> clazz, T content) {
+        HttpEntity<T> entity = new HttpEntity<>(content);
+        ResponseEntity<T> response = restTemplate.postForEntity(uri, entity, clazz);
+        return response.getBody();
     }
     
-    private <T> Mono<T> put(String uri, Class<T> clazz, T content) {
-        return webClient
-                .put()
-                .uri(uri)
-                .body(Mono.just(content), clazz)
-                .retrieve()
-                .bodyToMono(clazz)
-                .cache();
+    private <T> T put(String uri, Class<T> clazz, T content) {
+        HttpEntity<T> request = new HttpEntity<>(content);
+        HttpEntity<T> result = restTemplate.exchange(uri, HttpMethod.PUT, request, clazz);
+        return result.getBody();
     }
     
     private void delete(String uri) {
-        webClient
-                .delete()
-                .uri(uri)
-                .retrieve()
-                .toEntity(Void.class)
-                .cache();
+        restTemplate.delete(uri);
     }
 }

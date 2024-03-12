@@ -27,6 +27,8 @@ dependencies {
 	implementation libs.postgresql.driver
 	implementation libs.liquibase
 
+	implementation libs.spring.cache
+
 	compileOnly libs.lombok
 	annotationProcessor libs.lombok
 
