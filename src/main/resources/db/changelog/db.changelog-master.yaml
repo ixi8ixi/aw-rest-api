@@ -13,3 +13,5 @@ databaseChangeLog:
       file: classpath:/db/changelog/changes/006-create-observer-roles.sql
   - include:
       file: classpath:/db/changelog/changes/007-add-example-observers.sql
+  - include:
+      file: classpath:/db/changelog/changes/008-add-unique-constraint-for-username.sql
