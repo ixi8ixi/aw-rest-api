@@ -14,10 +14,14 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -186,22 +190,38 @@ public class CachedApiClient {
     public void invalidateCache() {}
 
     private <T> T get(String uri, Class<T> clazz) {
-        return restTemplate.getForEntity(uri, clazz).getBody();
+        try {
+            return restTemplate.getForEntity(uri, clazz).getBody();
+        } catch (HttpStatusCodeException e) {
+            throw new ResponseStatusException(e.getStatusCode(), e.getMessage(), e);
+        }
     }
 
     private <T> T post(String uri, Class<T> clazz, T content) {
-        HttpEntity<T> entity = new HttpEntity<>(content);
-        ResponseEntity<T> response = restTemplate.postForEntity(uri, entity, clazz);
-        return response.getBody();
+        try {
+            HttpEntity<T> entity = new HttpEntity<>(content);
+            ResponseEntity<T> response = restTemplate.postForEntity(uri, entity, clazz);
+            return response.getBody();
+        } catch (HttpStatusCodeException e) {
+            throw new ResponseStatusException(e.getStatusCode(), e.getMessage(), e);
+        }
     }
     
     private <T> T put(String uri, Class<T> clazz, T content) {
-        HttpEntity<T> request = new HttpEntity<>(content);
-        HttpEntity<T> result = restTemplate.exchange(uri, HttpMethod.PUT, request, clazz);
-        return result.getBody();
+        try {
+            HttpEntity<T> request = new HttpEntity<>(content);
+            HttpEntity<T> result = restTemplate.exchange(uri, HttpMethod.PUT, request, clazz);
+            return result.getBody();
+        } catch (HttpStatusCodeException e) {
+            throw new ResponseStatusException(e.getStatusCode(), e.getMessage(), e);
+        }
     }
     
     private void delete(String uri) {
-        restTemplate.delete(uri);
+        try {
+            restTemplate.delete(uri);
+        } catch (HttpStatusCodeException e) {
+            throw new ResponseStatusException(e.getStatusCode(), e.getMessage(), e);
+        }
     }
 }
