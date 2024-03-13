@@ -8,7 +8,7 @@ import lombok.*;
 @Table(name = "users")
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PACKAGE) // todo remove access
+@AllArgsConstructor
 @Getter
 @Setter
 public class UserEntity {
@@ -17,7 +17,7 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "username")
-    private String username; // todo add unique qualifier to table declaration
+    private String username;
     @Column(name = "password")
     private String password;
     @Enumerated(value = EnumType.STRING)

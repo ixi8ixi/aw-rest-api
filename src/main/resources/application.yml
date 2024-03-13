@@ -18,7 +18,6 @@ server:
 
 rest-api:
   host: https://jsonplaceholder.typicode.com/
-  timeout: 1000
 
 caching:
   timeout: 30000

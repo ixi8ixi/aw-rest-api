@@ -55,7 +55,7 @@ public class SecurityUser implements UserDetails {
         return active;
     }
 
-    public static UserDetails fromUserEntity(UserEntity entity) { // todo добавить права и добавить активность пользователя
+    public static UserDetails fromUserEntity(UserEntity entity) {
         return new SecurityUser(entity.getUsername(), entity.getPassword(), entity.getRole().getAuthorities(), true);
     }
 }

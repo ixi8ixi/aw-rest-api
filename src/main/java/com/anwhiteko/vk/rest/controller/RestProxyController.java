@@ -8,13 +8,8 @@ import com.anwhiteko.vk.rest.controller.dto.user.ToDo;
 import com.anwhiteko.vk.rest.controller.dto.user.User;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -23,11 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RestProxyController {
     private final CachedApiClient cachedApiClient;
-
-    @GetMapping
-    public String home(Authentication authentication) { // todo проверять наличие аутентификации в
-        return "Hello, World!";
-    }
 
     @GetMapping("/posts")
     @PreAuthorize("hasAuthority('VIEW_POSTS')")

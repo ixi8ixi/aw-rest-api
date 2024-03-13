@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Table(name = "events")
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PACKAGE) // todo remove access
+@AllArgsConstructor
 @Getter
 @Setter
 public class EventEntity {

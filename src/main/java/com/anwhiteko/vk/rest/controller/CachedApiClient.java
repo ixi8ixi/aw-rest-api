@@ -7,54 +7,46 @@ import com.anwhiteko.vk.rest.controller.dto.post.Post;
 import com.anwhiteko.vk.rest.controller.dto.user.ToDo;
 import com.anwhiteko.vk.rest.controller.dto.user.User;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CachedApiClient {
-    private final RestTemplate restTemplate;  // todo add http template exceptions handling
+    private final RestTemplate restTemplate;
 
     @Cacheable(value = "all_posts")
     public List<Post> viewPosts() {
-        log.info("all posts");
         return Arrays.asList(get("/posts", Post[].class));
     }
 
     @Cacheable(value = "posts", key = "#id")
     public Post viewSinglePost(long id) {
-        log.info("Singe get");
         return get("/posts/%s".formatted(id), Post.class);
     }
 
     @CachePut(value = "posts", key = "#result.id()")
     @CacheEvict(value = "all_posts", allEntries = true)
     public Post addPost(Post post) {
-        log.info("Single post");
         return post("/posts", Post.class, post);
     }
 
     @CachePut(value = "posts", key = "#result.id()")
     @CacheEvict(value = "all_posts", allEntries = true)
     public Post updatePost(long id, Post post) {
-        log.info("Single put");
         return put("/posts/%s".formatted(id), Post.class, post);
     }
 
@@ -64,13 +56,11 @@ public class CachedApiClient {
         @CacheEvict(value = "all_posts", allEntries = true)
     })
     public void deletePost(long id) {
-        log.info("Single delete");
         delete("/posts/%s".formatted(id));
     }
 
     @Cacheable(value = "comments", key = "#id")
     public List<Comment> viewComments(long id) {
-        log.info("comments");
         return Arrays.asList(get("/posts/%s/comments".formatted(id), Comment[].class));
     }
 
