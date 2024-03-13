@@ -14,6 +14,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+/**
+ * Logger filter saves data about each request to the events database.
+ */
 @Component
 @RequiredArgsConstructor
 public class LoggerFilter extends OncePerRequestFilter {

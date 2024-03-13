@@ -23,6 +23,10 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Cached service for retrieving data from the server. The cache is cleared
+ * every {@code timeout} milliseconds using the {@link CachedApiClient#invalidateCache()} method.
+ */
 @Service
 @RequiredArgsConstructor
 public class CachedApiClient {
